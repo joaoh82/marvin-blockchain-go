@@ -84,13 +84,10 @@ go test ./...
 
 ### Project Structure (WIP)
 The project is structured as follows:
-- `src/`: Contains the source code for the blockchain implementation.
-- `src/blockchain/`: Contains the blockchain and block implementation.
-- `src/network/`: Contains the networking implementation.
-- `src/transaction/`: Contains the transaction implementation.
-- `src/wallet/`: Contains the wallet implementation.
-- `src/main.rs`: Contains the entry point for the blockchain application.
-- `tests/`: Contains the unit tests for the blockchain implementation.
+`cmd/`: Contains the main entry point for the application.
+`pkg/`: Contains the core blockchain implementation and utilities.
+`internal/`: Contains internal packages and modules.
+`tests/`: Contains unit and integration tests.
 
 ### Contributing
 **Pull requests are warmly welcome!!!**
