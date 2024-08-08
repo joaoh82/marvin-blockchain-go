@@ -1,4 +1,4 @@
-package marvinctl
+package cli
 
 import (
 	"fmt"

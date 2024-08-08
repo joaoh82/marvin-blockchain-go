@@ -1,7 +1,7 @@
 package main
 
-import "github.com/joaoh82/marvinblockchain/cmd/marvinctl"
+import "github.com/joaoh82/marvinblockchain/cmd/cli"
 
 func main() {
-	marvinctl.Execute()
+	cli.Execute()
 }
