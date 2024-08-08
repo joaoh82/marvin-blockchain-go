@@ -67,6 +67,7 @@ go test ./...
 - [ ] Proof of Work (PoW) consensus mechanism
 - [ ] Peer-to-Peer (P2P) networking implementation (transport layer)
 - [ ] Basic transaction and block validation
+- [ ] Storage and persistence for blockchain data
 - [ ] EVM integration for smart contract support
 - [ ] JSON-RPC API implementation
 - [ ] Advanced transaction handling and validation
@@ -75,7 +76,6 @@ go test ./...
 - [ ] Comprehensive documentation and examples
 
 ### Roadmap (Subject to Change)
-- [ ] Features and improvements planned for the project:
 - [ ] Implement wallet functionalities
 - [ ] Improve EVM compatibility and support
 - [ ] Add more consensus mechanisms (e.g., PoS)
