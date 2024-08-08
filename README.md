@@ -14,7 +14,7 @@ Welcome to the Go implementation of the Marvin Blockchain. This project is part 
 
 Marvin Blockchain is a distributed ledger inspired by Bitcoin, implemented in Go. This project aims to provide a robust and scalable blockchain solution while comparing the nuances of building the same system in Rust.
 
-## Features
+## Features (WIP)
 
 - **Proof of Work (PoW) Consensus Mechanism**
 - **Peer-to-Peer (P2P) Networking**
@@ -72,7 +72,7 @@ go test ./...
 - [ ] Performance benchmarking and optimization
 - [ ] Comprehensive documentation and examples
 
-## Roadmap (Subject to Change)
+### Roadmap (Subject to Change)
 - [ ] Features and improvements planned for the project:
 - [ ] Implement wallet functionalities
 - [ ] Improve EVM compatibility and support
@@ -88,9 +88,15 @@ go test ./...
 
 ### Project Structure (WIP)
 The project is structured as follows:
-`cmd/`: Contains the main entry point for the application.
-`pkg/`: Contains the core blockchain implementation and utilities.
+`cmd/`: Contains the main entry point for the application and different binaries.
+`docs/`: Contains project documentation and guides.
+`core/`: Contains the core blockchain implementation and data structures.
+`network/`: Contains the networking and peer-to-peer communication logic.
+`crypto/`: Contains cryptographic utilities and security features.
+`wallet/`: Contains wallet and key management functionalities.
+`transactions/`: Contains transaction handling and validation logic.
 `internal/`: Contains internal packages and modules.
+`utils/`: Contains utility functions and helper methods.
 `tests/`: Contains unit and integration tests.
 
 ### Contributing
