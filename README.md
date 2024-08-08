@@ -16,10 +16,12 @@ Marvin Blockchain is a distributed ledger inspired by Bitcoin, implemented in Go
 
 ## Features (WIP)
 
-- **Proof of Work (PoW) Consensus Mechanism**
+- **Proof of Work (PoW) Consensus Mechanism** (Subject to Change)
 - **Peer-to-Peer (P2P) Networking**
+- **Storage and Persistence**
 - **Transaction and Block Validation**
 - **Smart Contract Support via EVM Compatibility**
+- **JSON-RPC API**
 - **Comprehensive Unit Tests and Benchmarks**
 
 ## Getting Started
