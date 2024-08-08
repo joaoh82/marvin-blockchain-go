@@ -90,16 +90,16 @@ go test ./...
 
 ### Project Structure (WIP)
 The project is structured as follows:
-`cmd/`: Contains the main entry point for the application and different binaries.
-`docs/`: Contains project documentation and guides.
-`core/`: Contains the core blockchain implementation and data structures.
-`network/`: Contains the networking and peer-to-peer communication logic.
-`crypto/`: Contains cryptographic utilities and security features.
-`wallet/`: Contains wallet and key management functionalities.
-`transactions/`: Contains transaction handling and validation logic.
-`internal/`: Contains internal packages and modules.
-`utils/`: Contains utility functions and helper methods.
-`tests/`: Contains unit and integration tests.
+- `cmd/`: Contains the main entry point for the application and different binaries.
+- `docs/`: Contains project documentation and guides.
+- `core/`: Contains the core blockchain implementation and data structures.
+- `network/`: Contains the networking and peer-to-peer communication logic.
+- `crypto/`: Contains cryptographic utilities and security features.
+- `wallet/`: Contains wallet and key management functionalities.
+- `transactions/`: Contains transaction handling and validation logic.
+- `internal/`: Contains internal packages and modules.
+- `utils/`: Contains utility functions and helper methods.
+- `tests/`: Contains unit and integration tests.
 
 ### Contributing
 **Pull requests are warmly welcome!!!**
