@@ -12,7 +12,7 @@ Welcome to the Go implementation of the Marvin Blockchain. This project is part 
 
 ## Project Overview
 
-Marvin Blockchain is a distributed ledger inspired by Bitcoin, implemented in Go. This project aims to provide a robust and scalable blockchain solution while comparing the nuances of building the same system in Rust.
+Marvin Blockchain is a distributed ledger and EVM Compatible inspired by Bitcoin and Ethereum, implemented in Go. This project aims to provide a robust and scalable blockchain solution while comparing the nuances of building the same system in Rust.
 
 ## Features (WIP)
 
