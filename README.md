@@ -65,7 +65,7 @@ go test ./...
 - [ ] Add CLI support for ease of interaction
 - [ ] Implement the basic blockchain data structure
 - [ ] Proof of Work (PoW) consensus mechanism
-- [ ] Peer-to-Peer (P2P) networking setup
+- [ ] Peer-to-Peer (P2P) networking implementation (transport layer)
 - [ ] Basic transaction and block validation
 - [ ] EVM integration for smart contract support
 - [ ] JSON-RPC API implementation
