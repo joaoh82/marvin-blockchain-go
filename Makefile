@@ -42,6 +42,11 @@ install-dependencies: ## Install dependencies for the service
 	go mod tidy
 
 .PHONY: build-cli
-## Build the binary for the service
+## Build the binary for marvinclt
 build-cli:
-	CGO_ENABLED=0 go build -o ./bin/${APP_NAME} ./cmd/app/*.go
+	CGO_ENABLED=0 go build -o ./bin/marvinclt ./cmd/marvinctl/*.go
+
+.PHONY: run-cli
+## Run the marvinclt locally by building it and running it
+run-cli: build-cli
+	./bin/marvinclt
