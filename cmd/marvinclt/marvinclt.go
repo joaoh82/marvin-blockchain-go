@@ -1,9 +1,10 @@
-package cli
+package main
 
 import (
 	"fmt"
 	"os"
 
+	"github.com/joaoh82/marvinblockchain/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -25,9 +26,20 @@ var versionCmd = &cobra.Command{
 	},
 }
 
+// versionCmd represents the version command
+var tempCmd = &cobra.Command{
+	Use:   "temp",
+	Short: "Prints a temp message",
+	Long:  `Prints a temp message for testing purposes`,
+	Run: func(cmd *cobra.Command, args []string) {
+		utils.TempFunc()
+	},
+}
+
 // init is called before the command is executed
 func init() {
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(tempCmd)
 }
 
 // Execute is the entry point for the command
@@ -36,4 +48,8 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
+}
+
+func main() {
+	Execute()
 }

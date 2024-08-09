@@ -1,7 +1,9 @@
 package main
 
-import "github.com/joaoh82/marvinblockchain/cmd/cli"
+import (
+	"fmt"
+)
 
 func main() {
-	cli.Execute()
+	fmt.Println("Marvin Blockchain")
 }
