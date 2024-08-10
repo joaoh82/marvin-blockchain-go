@@ -50,3 +50,8 @@ build-cli:
 ## Run the marvinclt locally by building it and running it
 run-cli: build-cli
 	./bin/marvinclt
+
+.PHONY: run-tests
+## Run the tests for the service
+run-tests:
+	go test -v ./...
