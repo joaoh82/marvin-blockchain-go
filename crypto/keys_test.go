@@ -1,6 +1,7 @@
 package crypto
 
 import (
+	"encoding/hex"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,6 +14,29 @@ func TestGeneratePrivateKey(t *testing.T) {
 
 	publicKey := privateKey.PublicKey()
 	assert.Equal(t, publicKeySize, len(publicKey.Bytes()))
+}
+
+func TestGetMnemonicFromEntropy(t *testing.T) {
+	entropy := "067f627b554f9f167782f1c8557860b6"
+	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
+
+	entroTest, _ := hex.DecodeString(entropy)
+	assert.Equal(t, mnemonic, GetMnemonicFromEntropy(entroTest))
+}
+
+func TestNewPrivateKeyFromMnemonic(t *testing.T) {
+	// entropy := "067f627b554f9f167782f1c8557860b6"
+	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
+	addressString := "6b5d53b1f559198ad5638467ff13b64b9adfdfeb"
+
+	privateKey := NewPrivateKeyfromMnemonic(mnemonic)
+	assert.Equal(t, privateKeySize, len(privateKey.Bytes()))
+
+	publicKey := privateKey.PublicKey()
+	assert.Equal(t, publicKeySize, len(publicKey.Bytes()))
+
+	address := publicKey.Address()
+	assert.Equal(t, addressString, address.String())
 }
 
 func TestNewPrivateKeyFromString(t *testing.T) {

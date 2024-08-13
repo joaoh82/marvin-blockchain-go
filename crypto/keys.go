@@ -3,8 +3,12 @@ package crypto
 import (
 	"crypto/ed25519"
 	"crypto/rand"
+	"crypto/sha512"
 	"encoding/hex"
 	"io"
+
+	"github.com/tyler-smith/go-bip39"
+	"golang.org/x/crypto/pbkdf2"
 )
 
 const (
@@ -18,6 +22,26 @@ const (
 // PrivateKey represents a private key for the Ed25519 signature scheme.
 type PrivateKey struct {
 	key ed25519.PrivateKey
+}
+
+func GetMnemonicFromEntropy(entropy []byte) string {
+	mnemonic, err := bip39.NewMnemonic(entropy)
+	if err != nil {
+		panic(err)
+	}
+	return mnemonic
+}
+
+// NewPrivateKeyfromMenmonic creates a new private key from a given mnemonic.
+func NewPrivateKeyfromMnemonic(mnemonic string) PrivateKey {
+	seed := SeedFromMnemonic(mnemonic)
+	return NewPrivateKeyFromSeed(seed)
+}
+
+// SeedFromMnemonic creates a new seed from a given mnemonic.
+func SeedFromMnemonic(mnemonic string) []byte {
+	seed := pbkdf2.Key([]byte(mnemonic), []byte("mnemonic"+"Secret Passphrase"), 2048, 32, sha512.New)
+	return seed
 }
 
 // NewPrivateKeyfromString creates a new private key from a given hex string.

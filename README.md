@@ -46,24 +46,37 @@ go mod tidy
 
 3. Build the project:
 ```sh
-go build -o marvin-blockchain-go
+make build
+```
+
+4. Build the cli:
+```sh
+make build-cli
 ```
 
 ### Running the Blockchain
 To start a node on the Marvin Blockchain:
 ```sh
-./marvin-blockchain-go
+./bin/marvin
+```
+
+### Running the CLI
+To the CLI application to interact with the blockchain:
+```sh
+./bin/marvinctl --help
 ```
 
 ### Running Tests
 To run the unit tests:
 ```sh
-go test ./...
+make run-tests
 ```
 
 ### Project Progress (WIP)
 - [x] Add CLI support for ease of interaction
 - [x] Implemented key pair creation, sign and verify
+- [x] Create key pair with mnemonic seed
+- [x] Add address command to CLI
 - [ ] Implement the basic blockchain data structure
 - [ ] Basic transaction and block validation
 

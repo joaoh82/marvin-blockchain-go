@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joaoh82/marvinblockchain/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -14,6 +13,7 @@ var rootCmd = &cobra.Command{
 	Short:   "marvinclt is a cli interface for the Marvin Blockchain",
 	Long:    `marvinclt is a cli interface for the Marvin Blockchain`,
 	Example: "Usage: marvinctl [command] [flags] [args]",
+	Version: "0.0.1",
 }
 
 // versionCmd represents the version command
@@ -26,20 +26,13 @@ var versionCmd = &cobra.Command{
 	},
 }
 
-// versionCmd represents the version command
-var tempCmd = &cobra.Command{
-	Use:   "temp",
-	Short: "Prints a temp message",
-	Long:  `Prints a temp message for testing purposes`,
-	Run: func(cmd *cobra.Command, args []string) {
-		utils.TempFunc()
-	},
-}
-
 // init is called before the command is executed
 func init() {
 	rootCmd.AddCommand(versionCmd)
-	rootCmd.AddCommand(tempCmd)
+	rootCmd.AddCommand(addressCmd)
+	rootCmd.SetVersionTemplate("marvinclt v0.0.1 -- HEAD")
+	addressCmd.AddCommand(addressCreateCmd)
+	addressCmd.AddCommand(mnemonicAddressRestoreCmd)
 }
 
 // Execute is the entry point for the command

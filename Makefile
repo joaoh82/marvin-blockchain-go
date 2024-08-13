@@ -41,15 +41,15 @@ all: help
 install-dependencies: ## Install dependencies for the service
 	go mod tidy
 
+.PHONY: build
+## Build the binary for the marvin blockchain
+build:
+	CGO_ENABLED=0 go build -o ./bin/marvin ./*.go
+
 .PHONY: build-cli
 ## Build the binary for marvinclt
 build-cli:
-	CGO_ENABLED=0 go build -o ./bin/marvinclt ./cmd/marvinctl/*.go
-
-.PHONY: run-cli
-## Run the marvinclt locally by building it and running it
-run-cli: build-cli
-	./bin/marvinclt
+	CGO_ENABLED=0 go build -o ./bin/marvinctl ./cmd/marvinctl/*.go
 
 .PHONY: run-tests
 ## Run the tests for the service
