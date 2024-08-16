@@ -17,6 +17,7 @@ var addressCmd = &cobra.Command{
 	Example:               "Usage: marvinctl address [command] [flags] [args]",
 }
 
+// addressCreateCmd represents the create command
 var addressCreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: `Create a new address`,
@@ -37,6 +38,7 @@ var addressCreateCmd = &cobra.Command{
 	},
 }
 
+// mnemonicAddressRestoreCmd represents the restore command
 var mnemonicAddressRestoreCmd = &cobra.Command{
 	Use:   "restore",
 	Short: "Restore an address from a mnemonic",

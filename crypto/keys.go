@@ -24,6 +24,7 @@ type PrivateKey struct {
 	key ed25519.PrivateKey
 }
 
+// GetMnemonicFromEntropy generates a new mnemonic from a given entropy.
 func GetMnemonicFromEntropy(entropy []byte) string {
 	mnemonic, err := bip39.NewMnemonic(entropy)
 	if err != nil {
@@ -102,6 +103,7 @@ type PublicKey struct {
 	key ed25519.PublicKey
 }
 
+// Address returns the address for the public key.
 func (p *PublicKey) Address() Address {
 	return Address{
 		value: p.key[:addressSize],
