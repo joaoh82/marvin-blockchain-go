@@ -57,10 +57,10 @@ func TestPrivateKeySign(t *testing.T) {
 	invalidPublicKey := invalidPrivateKey.PublicKey()
 
 	data := []byte("hello, world")
-	signature := privateKey.Sign(data)
+	signature, _ := privateKey.Sign(data)
 
 	// Check that the signature is the correct size
-	assert.Equal(t, signatureSize, len(signature.value))
+	assert.Equal(t, signatureSize, len(signature.Value))
 
 	// Check that the signature is valid
 	assert.True(t, signature.Verify(publicKey, data))

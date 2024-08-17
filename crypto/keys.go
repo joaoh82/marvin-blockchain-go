@@ -21,7 +21,7 @@ const (
 
 // PrivateKey represents a private key for the Ed25519 signature scheme.
 type PrivateKey struct {
-	key ed25519.PrivateKey
+	Key ed25519.PrivateKey
 }
 
 // GetMnemonicFromEntropy generates a new mnemonic from a given entropy.
@@ -61,7 +61,7 @@ func NewPrivateKeyFromSeed(seed []byte) PrivateKey {
 	}
 
 	return PrivateKey{
-		key: ed25519.NewKeyFromSeed(seed),
+		Key: ed25519.NewKeyFromSeed(seed),
 	}
 }
 
@@ -73,75 +73,75 @@ func GeneratePrivateKey() *PrivateKey {
 		panic(err)
 	}
 	return &PrivateKey{
-		key: ed25519.NewKeyFromSeed(seed),
+		Key: ed25519.NewKeyFromSeed(seed),
 	}
 }
 
 // Bytes creates a new private key from a byte slice.
 func (p *PrivateKey) Bytes() []byte {
-	return p.key
+	return p.Key
 }
 
 // Sign signs the data with the private key.
-func (p *PrivateKey) Sign(data []byte) *Signature {
+func (p *PrivateKey) Sign(data []byte) (*Signature, error) {
 	return &Signature{
-		value: ed25519.Sign(p.key, data),
-	}
+		Value: ed25519.Sign(p.Key, data),
+	}, nil
 }
 
 // PublicKey returns the public key for the private key.
 func (p *PrivateKey) PublicKey() *PublicKey {
 	b := make([]byte, publicKeySize)
-	copy(b, p.key[32:])
+	copy(b, p.Key[32:])
 	return &PublicKey{
-		key: b,
+		Key: b,
 	}
 }
 
 // PublicKey represents a public key for the Ed25519 signature scheme.
 type PublicKey struct {
-	key ed25519.PublicKey
+	Key ed25519.PublicKey
 }
 
 // Address returns the address for the public key.
 func (p *PublicKey) Address() Address {
 	return Address{
-		value: p.key[:addressSize],
+		Value: p.Key[:addressSize],
 	}
 }
 
 // Bytes creates a new public key from a byte slice.
 func (p *PublicKey) Bytes() []byte {
-	return p.key
+	return p.Key
 }
 
 // Signature represents a signature for the Ed25519 signature scheme.
 type Signature struct {
-	value []byte
+	Value []byte
 }
 
 // Bytes creates a new signature from a byte slice.
 func (s *Signature) Bytes() []byte {
-	return s.value
+	return s.Value
 }
 
 // Verify verifies the signature of the data with the public key.
 // It returns true if the signature is valid, and false otherwise.
 func (s *Signature) Verify(publicKey *PublicKey, data []byte) bool {
-	return ed25519.Verify(publicKey.key, data, s.value)
+	return ed25519.Verify(publicKey.Key, data, s.Value)
 }
 
 // Address represents an address for the Ed25519 signature scheme.
 type Address struct {
-	value []byte
+	Value []byte
 }
 
 // Bytes creates a new address from a byte slice.
 func (a *Address) Bytes() []byte {
-	return a.value
+	return a.Value
 }
 
 // String returns the address as a hex string.
 func (a Address) String() string {
-	return hex.EncodeToString(a.value)
+	return hex.EncodeToString(a.Value)
 }
