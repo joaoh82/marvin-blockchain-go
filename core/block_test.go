@@ -2,7 +2,6 @@ package core
 
 import (
 	"bytes"
-	"fmt"
 	"testing"
 	"time"
 
@@ -39,7 +38,6 @@ func TestVerifyBlock(t *testing.T) {
 // TestEncodeDecodeBlock tests encoding and decoding a block
 func TestEncodeDecodeBlock(t *testing.T) {
 	b := GenerateRandomBlock(t, 1, types.Hash{})
-	fmt.Println("block: ", b)
 	buf := &bytes.Buffer{}
 	assert.Nil(t, b.Encode(NewBlockEncoder(buf)))
 
@@ -70,7 +68,6 @@ func GenerateRandomBlock(t *testing.T, height uint64, prevBlockHash types.Hash) 
 	}
 
 	b, err := NewBlock(header, []*Transaction{})
-	fmt.Println("block: ", b)
 	assert.Nil(t, err)
 	txHash, err := CalculateTxHash(b.Transactions)
 	assert.Nil(t, err)

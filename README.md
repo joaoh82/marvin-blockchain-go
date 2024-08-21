@@ -78,8 +78,8 @@ make run-tests
 - [x] Implemented key pair creation, sign and verify
 - [x] Create key pair with mnemonic seed
 - [x] Add address command to CLI
-- [x] Implement the basic blockchain data structure
-- [ ] Basic transaction and block validation
+- [x] Basic transaction and block data structures and validation
+- [ ] Implement the basic blockchain data structure
 
 ### Roadmap (Subject to Change)
 - [ ] Proof of Work (PoW) consensus mechanism
