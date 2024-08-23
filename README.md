@@ -8,7 +8,7 @@ Welcome to the Go implementation of the Marvin Blockchain. This project is part 
 
 ### Read the series of posts about it:
 ##### Crafting a Blockchain in Go and Rust: A Comparative Journey
-[Crafting a Blockchain in Go and Rust: A Comparative Journey - Series](https://hashblog.thepolyglotprogrammer.com/series/crafting-a-blockchain-in-go-and-rust-a-comparative-journey))
+[Crafting a Blockchain in Go and Rust: A Comparative Journey - Series](https://hashblog.thepolyglotprogrammer.com/series/crafting-a-blockchain-in-go-and-rust-a-comparative-journey)
 
 ## Project Overview
 
