@@ -125,6 +125,11 @@ func (s *Signature) Bytes() []byte {
 	return s.Value
 }
 
+// String returns the signature as a hex string.
+func (s Signature) String() string {
+	return hex.EncodeToString(s.Value)
+}
+
 // Verify verifies the signature of the data with the public key.
 // It returns true if the signature is valid, and false otherwise.
 func (s *Signature) Verify(publicKey *PublicKey, data []byte) bool {

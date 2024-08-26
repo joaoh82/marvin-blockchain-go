@@ -84,6 +84,9 @@ func (b *Block) Sign(privKey crypto.PrivateKey) error {
 	b.PublicKey = *privKey.PublicKey()
 	b.Signature = signature
 
+	fmt.Println("Block signed by", b.PublicKey.Address().String())
+	fmt.Println("Block signature", b.Signature.String())
+
 	return nil
 }
 
@@ -134,7 +137,7 @@ func (b *Block) Hash(hasher Hasher[*Header]) types.Hash {
 	return b.hash
 }
 
-// String returns a string representation of the block.
+// CalculateTxHash calculates the hash of the transactions.
 func CalculateTxHash(txs []*Transaction) (types.Hash, error) {
 	var hash types.Hash
 	buf := &bytes.Buffer{}

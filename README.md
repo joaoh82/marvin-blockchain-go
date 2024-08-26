@@ -69,7 +69,7 @@ To the CLI application to interact with the blockchain:
 ### Running Tests
 To run the unit tests:
 ```sh
-make run-tests
+make test
 ```
 
 ### Project Progress (WIP)

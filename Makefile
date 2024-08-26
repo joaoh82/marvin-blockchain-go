@@ -51,7 +51,7 @@ build:
 build-cli:
 	CGO_ENABLED=0 go build -o ./bin/marvinctl ./cmd/marvinctl/*.go
 
-.PHONY: tests
+.PHONY: test
 ## Run the tests for the service
-tests:
+test:
 	go test -v ./...

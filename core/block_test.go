@@ -12,19 +12,33 @@ import (
 
 // TestSignBlock tests signing a block
 func TestSignBlock(t *testing.T) {
-	privKey := crypto.GeneratePrivateKey()
+	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
+	addressString := "6b5d53b1f559198ad5638467ff13b64b9adfdfeb"
+
+	privateKey := crypto.NewPrivateKeyfromMnemonic(mnemonic)
+	publicKey := privateKey.PublicKey()
+	address := publicKey.Address()
+	assert.Equal(t, addressString, address.String())
+
 	b := GenerateRandomBlock(t, 0, types.Hash{})
 
-	assert.Nil(t, b.Sign(*privKey))
+	assert.Nil(t, b.Sign(privateKey))
 	assert.NotNil(t, b.Signature)
 }
 
 // TestVerifyBlock tests verifying a block
 func TestVerifyBlock(t *testing.T) {
-	privKey := crypto.GeneratePrivateKey()
+	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
+	addressString := "6b5d53b1f559198ad5638467ff13b64b9adfdfeb"
+
+	privateKey := crypto.NewPrivateKeyfromMnemonic(mnemonic)
+	publicKey := privateKey.PublicKey()
+	address := publicKey.Address()
+	assert.Equal(t, addressString, address.String())
+
 	b := GenerateRandomBlock(t, 0, types.Hash{})
 
-	assert.Nil(t, b.Sign(*privKey))
+	assert.Nil(t, b.Sign(privateKey))
 	assert.Nil(t, b.Verify())
 
 	otherPrivKey := crypto.GeneratePrivateKey()
@@ -57,8 +71,13 @@ func TestEncodeDecodeBlock(t *testing.T) {
 
 // GenerateRandomBlock generates a random block for testing purposes
 func GenerateRandomBlock(t *testing.T, height uint64, prevBlockHash types.Hash) *Block {
-	privateKey := crypto.GeneratePrivateKey()
-	// tx := GenerateRandomTxWithSignature(t)
+	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
+	addressString := "6b5d53b1f559198ad5638467ff13b64b9adfdfeb"
+
+	privateKey := crypto.NewPrivateKeyfromMnemonic(mnemonic)
+	publicKey := privateKey.PublicKey()
+	address := publicKey.Address()
+	assert.Equal(t, addressString, address.String())
 
 	header := &Header{
 		Version:       1,
@@ -67,12 +86,14 @@ func GenerateRandomBlock(t *testing.T, height uint64, prevBlockHash types.Hash) 
 		Timestamp:     time.Now().UnixNano(),
 	}
 
+	// tx := GenerateRandomTxWithSignature(t)
+
 	b, err := NewBlock(header, []*Transaction{})
 	assert.Nil(t, err)
 	txHash, err := CalculateTxHash(b.Transactions)
 	assert.Nil(t, err)
 	b.Header.TxHash = txHash
-	assert.Nil(t, b.Sign(*privateKey))
+	assert.Nil(t, b.Sign(privateKey))
 
 	return b
 }
