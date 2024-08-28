@@ -55,3 +55,10 @@ build-cli:
 ## Run the tests for the service
 test:
 	go test -v ./...
+
+.PHONY: proto
+## Generate the protobuf files
+proto:
+	rm -rf proto/*.pb.go
+	protoc --go_out=. --go_opt=paths=source_relative \
+    proto/*.proto

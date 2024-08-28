@@ -1,99 +1,192 @@
 package core
 
 import (
-	"bytes"
 	"testing"
-	"time"
 
 	"github.com/joaoh82/marvinblockchain/crypto"
-	"github.com/joaoh82/marvinblockchain/types"
+	"github.com/joaoh82/marvinblockchain/proto"
 	"github.com/stretchr/testify/assert"
 )
 
-// TestSignBlock tests signing a block
-func TestSignBlock(t *testing.T) {
-	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
-	addressString := "6b5d53b1f559198ad5638467ff13b64b9adfdfeb"
-
-	privateKey := crypto.NewPrivateKeyfromMnemonic(mnemonic)
-	publicKey := privateKey.PublicKey()
-	address := publicKey.Address()
-	assert.Equal(t, addressString, address.String())
-
-	b := GenerateRandomBlock(t, 0, types.Hash{})
-
-	assert.Nil(t, b.Sign(privateKey))
-	assert.NotNil(t, b.Signature)
-}
-
-// TestVerifyBlock tests verifying a block
-func TestVerifyBlock(t *testing.T) {
-	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
-	addressString := "6b5d53b1f559198ad5638467ff13b64b9adfdfeb"
-
-	privateKey := crypto.NewPrivateKeyfromMnemonic(mnemonic)
-	publicKey := privateKey.PublicKey()
-	address := publicKey.Address()
-	assert.Equal(t, addressString, address.String())
-
-	b := GenerateRandomBlock(t, 0, types.Hash{})
-
-	assert.Nil(t, b.Sign(privateKey))
-	assert.Nil(t, b.Verify())
-
-	otherPrivKey := crypto.GeneratePrivateKey()
-	b.PublicKey = *otherPrivKey.PublicKey()
-	assert.NotNil(t, b.Verify())
-
-	b.Height = 100
-	assert.NotNil(t, b.Verify())
-}
-
-// TestEncodeDecodeBlock tests encoding and decoding a block
-func TestEncodeDecodeBlock(t *testing.T) {
-	b := GenerateRandomBlock(t, 1, types.Hash{})
-	buf := &bytes.Buffer{}
-	assert.Nil(t, b.Encode(NewBlockEncoder(buf)))
-
-	bDecode := new(Block)
-	assert.Nil(t, bDecode.Decode(NewBlockDecoder(buf)))
-
-	assert.Equal(t, b.Header, bDecode.Header)
-
-	for i := 0; i < len(b.Transactions); i++ {
-		b.Transactions[i].hash = types.Hash{}
-		assert.Equal(t, b.Transactions[i], bDecode.Transactions[i])
+func TestSerializeDeserializeHeader(t *testing.T) {
+	h := &proto.Header{
+		PrevBlockHash: []byte("prev"),
+		TxHash:        []byte("tx"),
+		Version:       1,
+		Height:        1,
+		Timestamp:     1,
+		Nonce:         1,
+		Difficulty:    1,
 	}
 
-	assert.Equal(t, b.PublicKey, bDecode.PublicKey)
-	assert.Equal(t, b.Signature, bDecode.Signature)
+	data, err := SerializeHeader(h)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	h2, err := DeserializeHeader(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, h.PrevBlockHash, h2.PrevBlockHash)
+	assert.Equal(t, h.TxHash, h2.TxHash)
+	assert.Equal(t, h.Version, h2.Version)
+	assert.Equal(t, h.Height, h2.Height)
+	assert.Equal(t, h.Timestamp, h2.Timestamp)
+	assert.Equal(t, h.Nonce, h2.Nonce)
+	assert.Equal(t, h.Difficulty, h2.Difficulty)
+}
+
+func TestSerializeDeserializeBlock(t *testing.T) {
+	b := &proto.Block{
+		Header: &proto.Header{
+			PrevBlockHash: []byte("prev"),
+			TxHash:        []byte("tx"),
+			Version:       1,
+			Height:        1,
+			Timestamp:     1,
+			Nonce:         1,
+			Difficulty:    1,
+		},
+		Transactions: []*proto.Transaction{
+			{
+				From:      []byte("from"),
+				To:        []byte("to"),
+				Value:     1,
+				Data:      []byte("data"),
+				Signature: []byte("sig"),
+				Nonce:     1,
+				Hash:      []byte("hash"),
+			},
+		},
+	}
+
+	data, err := SerializeBlock(b)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	b2, err := DeserializeBlock(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, b.Header.PrevBlockHash, b2.Header.PrevBlockHash)
+	assert.Equal(t, b.Header.TxHash, b2.Header.TxHash)
+	assert.Equal(t, b.Header.Version, b2.Header.Version)
+	assert.Equal(t, b.Header.Height, b2.Header.Height)
+	assert.Equal(t, b.Header.Timestamp, b2.Header.Timestamp)
+	assert.Equal(t, b.Header.Nonce, b2.Header.Nonce)
+	assert.Equal(t, b.Header.Difficulty, b2.Header.Difficulty)
+
+	assert.Equal(t, b.Transactions[0].From, b2.Transactions[0].From)
+	assert.Equal(t, b.Transactions[0].To, b2.Transactions[0].To)
+	assert.Equal(t, b.Transactions[0].Value, b2.Transactions[0].Value)
+	assert.Equal(t, b.Transactions[0].Data, b2.Transactions[0].Data)
+}
+
+func TestSignBlockV2(t *testing.T) {
+	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
+	addressString := "e15af3cd7d9c09ebaf20d1f97ea396c218b66037"
+
+	privateKey := crypto.NewPrivateKeyfromMnemonic(mnemonic)
+	publicKey := privateKey.PublicKey()
+	address := publicKey.Address()
+	assert.Equal(t, addressString, address.String())
+
+	b := &proto.Block{
+		Header: &proto.Header{
+			PrevBlockHash: []byte("prev"),
+			TxHash:        []byte("tx"),
+			Version:       1,
+			Height:        100,
+			Timestamp:     1724695016265493000,
+			Nonce:         1,
+			Difficulty:    1,
+		},
+		Transactions: []*proto.Transaction{
+			{
+				From:      []byte("from"),
+				To:        []byte("to"),
+				Value:     1,
+				Data:      []byte("data"),
+				Signature: []byte("sig"),
+				Nonce:     1,
+				Hash:      []byte("hash"),
+			},
+		},
+	}
+
+	sig, err := SignBlock(&privateKey, b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.NotNil(t, sig)
+}
+
+func TestVerifyBlockV2(t *testing.T) {
+	b := GenerateRandomBlockV2(t, 100, []byte("prev"))
+	isValid, err := VerifyBlock(b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(t, isValid)
+
+	// Test with invalid keypair
+	invalidPrivateKey := crypto.GeneratePrivateKey()
+	invalidPublicKey := invalidPrivateKey.PublicKey()
+	b.PublicKey = invalidPublicKey.Bytes()
+	isValid, err = VerifyBlock(b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.False(t, isValid)
+
 }
 
 // GenerateRandomBlock generates a random block for testing purposes
-func GenerateRandomBlock(t *testing.T, height uint64, prevBlockHash types.Hash) *Block {
+func GenerateRandomBlockV2(t *testing.T, height uint64, prevBlockHash []byte) *proto.Block {
 	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
-	addressString := "6b5d53b1f559198ad5638467ff13b64b9adfdfeb"
+	addressString := "e15af3cd7d9c09ebaf20d1f97ea396c218b66037"
 
 	privateKey := crypto.NewPrivateKeyfromMnemonic(mnemonic)
 	publicKey := privateKey.PublicKey()
 	address := publicKey.Address()
 	assert.Equal(t, addressString, address.String())
 
-	header := &Header{
-		Version:       1,
-		PrevBlockHash: prevBlockHash,
-		Height:        height,
-		Timestamp:     time.Now().UnixNano(),
+	toPrivKey := crypto.GeneratePrivateKey()
+
+	b := &proto.Block{
+		Header: &proto.Header{
+			PrevBlockHash: []byte("prev"),
+			TxHash:        []byte("tx"),
+			Version:       1,
+			Height:        100,
+			Timestamp:     1724695016265493000,
+			Nonce:         1,
+			Difficulty:    1,
+		},
 	}
 
-	// tx := GenerateRandomTxWithSignature(t)
+	tx := &proto.Transaction{
+		From:  privateKey.PublicKey().Bytes(),
+		To:    toPrivKey.PublicKey().Bytes(),
+		Value: 1,
+		Data:  []byte("data"),
+		Nonce: 1,
+	}
+	SignTransaction(&privateKey, tx)
+	AddTransaction(b, tx)
 
-	b, err := NewBlock(header, []*Transaction{})
-	assert.Nil(t, err)
-	txHash, err := CalculateTxHash(b.Transactions)
+	txHash, err := CalculateTxHashV2(b.Transactions)
 	assert.Nil(t, err)
 	b.Header.TxHash = txHash
-	assert.Nil(t, b.Sign(privateKey))
+	sig, err := SignBlock(&privateKey, b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.NotNil(t, sig)
 
 	return b
 }

@@ -1,82 +1,65 @@
 package core
 
 import (
-	"errors"
-
-	"math/rand"
+	"crypto/sha256"
 
 	"github.com/joaoh82/marvinblockchain/crypto"
-	"github.com/joaoh82/marvinblockchain/types"
+	"github.com/joaoh82/marvinblockchain/proto"
+	pb "google.golang.org/protobuf/proto"
 )
 
-var (
-	ErrorInvalidSignature = errors.New("invalid transaction signature")
-)
-
-// Transaction represents a transaction in the blockchain.
-type Transaction struct {
-	From      crypto.PublicKey  // Public key of the sender
-	To        crypto.PublicKey  // Public key of the receiver
-	Value     uint64            // Amount to transfer
-	Data      []byte            // Arbitrary data
-	Signature *crypto.Signature // Signature of the transaction
-	Nonce     int64             // Nonce of the transaction
-
-	// hash of the transaction
-	hash types.Hash
-}
-
-// NewTransaction creates a new transaction.
-func NewTransaction(data []byte) *Transaction {
-	return &Transaction{
-		Data:  data,
-		Nonce: rand.Int63n(1000000000000000),
-	}
-}
-
-// Hash calculates the hash of the transaction.
-func (tx *Transaction) Hash(hasher Hasher[*Transaction]) types.Hash {
-	if tx.hash.IsZero() {
-		tx.hash = hasher.Hash(tx)
-	}
-
-	return tx.hash
-}
-
-// Sign signs the transaction with the given private key.
-func (tx *Transaction) Sign(privateKey *crypto.PrivateKey) error {
-	hash := tx.Hash(TxHasher{})
-	signature, err := privateKey.Sign(hash.Bytes())
+// SignTransaction signs a transaction with a private key.
+func SignTransaction(pk *crypto.PrivateKey, tx *proto.Transaction) error {
+	hash, err := HashTransaction(tx)
 	if err != nil {
 		return err
 	}
 
-	tx.Signature = signature
-	tx.From = *privateKey.PublicKey()
+	sig, err := pk.Sign(hash)
+	if err != nil {
+		return err
+	}
+
+	tx.Signature = sig.Bytes()
+	tx.Hash = hash
+	// tx.From = pk.PublicKey().Bytes()
 
 	return nil
 }
 
-// Verify verifies the signature of the transaction.
-func (tx *Transaction) Verify() error {
-	if tx.Signature == nil {
-		return errors.New("missing signature")
+// HashTransaction hashes a transaction.
+func HashTransaction(tx *proto.Transaction) ([]byte, error) {
+	b, err := pb.Marshal(tx)
+	if err != nil {
+		return nil, err
 	}
+	hash := sha256.Sum256(b)
 
-	hash := tx.Hash(TxHasher{})
-	if !tx.Signature.Verify(&tx.From, hash.Bytes()) {
-		return ErrorInvalidSignature
-	}
+	tx.Hash = hash[:]
 
-	return nil
+	return hash[:], nil
 }
 
-// Decode decodes the transaction from the given decoder.
-func (tx *Transaction) Decode(dec Decoder[*Transaction]) error {
-	return dec.Decode(tx)
-}
+// VerifyTransaction verifies the signature of a transaction.
+func VerifyTransaction(tx *proto.Transaction) (bool, error) {
+	// Temporarily remove the signature to calculate the hash
+	tempSig := tx.Signature
+	tempHash := tx.Hash
+	tx.Signature = nil
+	tx.Hash = nil
 
-// Encode encodes the transaction with the given encoder.
-func (tx *Transaction) Encode(enc Encoder[*Transaction]) error {
-	return enc.Encode(tx)
+	// Calculate the hash without the signature and hash
+	hash, err := HashTransaction(tx)
+	if err != nil {
+		return false, err
+	}
+	// Restore the signature
+	tx.Signature = tempSig
+	tx.Hash = tempHash
+
+	signature := crypto.SignatureFromBytes(tx.Signature)
+	publicKey := crypto.PublicKeyFromBytes(tx.From)
+	isValid := signature.Verify(publicKey, hash)
+
+	return isValid, nil
 }

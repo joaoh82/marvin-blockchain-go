@@ -23,7 +23,7 @@ func (h Hash) IsZero() bool {
 	return true
 }
 
-// ToSlice returns the hash as a byte slice.
+// Bytes returns the hash as a byte slice.
 func (h Hash) Bytes() []byte {
 	b := make([]byte, HashSize)
 	for i := 0; i < HashSize; i++ {

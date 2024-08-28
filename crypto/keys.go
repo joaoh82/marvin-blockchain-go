@@ -13,8 +13,8 @@ import (
 
 const (
 	privateKeySize = ed25519.PrivateKeySize // 64
-	publicKeySize  = ed25519.PublicKeySize  // 32
-	signatureSize  = ed25519.SignatureSize  // 64
+	PublicKeySize  = ed25519.PublicKeySize  // 32
+	SignatureSize  = ed25519.SignatureSize  // 64
 	seedSize       = 32
 	addressSize    = 20
 )
@@ -41,7 +41,7 @@ func NewPrivateKeyfromMnemonic(mnemonic string) PrivateKey {
 
 // SeedFromMnemonic creates a new seed from a given mnemonic.
 func SeedFromMnemonic(mnemonic string) []byte {
-	seed := pbkdf2.Key([]byte(mnemonic), []byte("mnemonic"+"Secret Passphrase"), 2048, 32, sha512.New)
+	seed := pbkdf2.Key([]byte(mnemonic), []byte("mnemonicSecret Passphrase"), 1024, 32, sha512.New)
 	return seed
 }
 
@@ -91,16 +91,30 @@ func (p *PrivateKey) Sign(data []byte) (*Signature, error) {
 
 // PublicKey returns the public key for the private key.
 func (p *PrivateKey) PublicKey() *PublicKey {
-	b := make([]byte, publicKeySize)
+	b := make([]byte, PublicKeySize)
 	copy(b, p.Key[32:])
 	return &PublicKey{
 		Key: b,
 	}
 }
 
+// String returns the private key as a hex string.
+func (p *PrivateKey) String() string {
+	return hex.EncodeToString(p.Key)
+}
+
 // PublicKey represents a public key for the Ed25519 signature scheme.
 type PublicKey struct {
 	Key ed25519.PublicKey
+}
+
+func PublicKeyFromBytes(b []byte) *PublicKey {
+	if len(b) != PublicKeySize {
+		panic("invalid public key length")
+	}
+	return &PublicKey{
+		Key: ed25519.PublicKey(b),
+	}
 }
 
 // Address returns the address for the public key.
@@ -115,9 +129,22 @@ func (p *PublicKey) Bytes() []byte {
 	return p.Key
 }
 
+func (p *PublicKey) String() string {
+	return hex.EncodeToString(p.Key)
+}
+
 // Signature represents a signature for the Ed25519 signature scheme.
 type Signature struct {
 	Value []byte
+}
+
+func SignatureFromBytes(b []byte) *Signature {
+	if len(b) != SignatureSize {
+		panic("signature length of the bytes not equal to 64")
+	}
+	return &Signature{
+		Value: b,
+	}
 }
 
 // Bytes creates a new signature from a byte slice.
@@ -139,6 +166,15 @@ func (s *Signature) Verify(publicKey *PublicKey, data []byte) bool {
 // Address represents an address for the Ed25519 signature scheme.
 type Address struct {
 	Value []byte
+}
+
+func AddressFromBytes(b []byte) Address {
+	if len(b) != addressSize {
+		panic("length of the (address) bytes not equal to 20")
+	}
+	return Address{
+		Value: b,
+	}
 }
 
 // Bytes creates a new address from a byte slice.

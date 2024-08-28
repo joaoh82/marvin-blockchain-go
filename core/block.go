@@ -1,154 +1,136 @@
 package core
 
 import (
-	"bytes"
 	"crypto/sha256"
-	"encoding/gob"
-	"fmt"
+	"errors"
 
 	"github.com/joaoh82/marvinblockchain/crypto"
-	"github.com/joaoh82/marvinblockchain/types"
+	"github.com/joaoh82/marvinblockchain/proto"
+	pb "google.golang.org/protobuf/proto"
 )
 
-// Header represents the header of a block in the blockchain.
-type Header struct {
-	PrevBlockHash types.Hash // Hash of the previous block
-
-	TxHash    types.Hash // Hash of the transactions in the block
-	Version   uint32     // Version of the block
-	Height    uint64     // Height of the block in the blockchain
-	Timestamp int64      // Timestamp of the block
-
-	Nonce      uint64 // Nonce used to mine the block
-	Difficulty uint8  // Difficulty used to mine the block
-}
-
-// Bytes returns the byte representation of the header.
-func (h *Header) Bytes() []byte {
-	b := &bytes.Buffer{}
-	enc := gob.NewEncoder(b)
-	enc.Encode(h)
-
-	return b.Bytes()
-}
-
-// String returns a string representation of the header.
-func (h *Header) String() string {
-	return fmt.Sprintf(`
-Header {
-	PrevBlockHash: %x,
-	TxHash: %x,
-	Version: %d,
-	Height: %d,
-	Timestamp: %d,
-	Nonce: %d,
-	Difficulty: %d
-}`,
-		h.PrevBlockHash, h.TxHash, h.Version, h.Height, h.Timestamp, h.Nonce, h.Difficulty)
-}
-
-// Block represents a block in the blockchain.
-type Block struct {
-	*Header
-
-	Transactions []*Transaction
-	PublicKey    crypto.PublicKey
-	Signature    *crypto.Signature
-
-	// Cached version of the header hash
-	hash types.Hash
-}
-
-// NewBlock creates a new block with the given header and transactions.
-func NewBlock(h *Header, txs []*Transaction) (*Block, error) {
-	return &Block{
-		Header:       h,
-		Transactions: txs,
-	}, nil
-}
-
-// NewBlockFromPrevHeader creates a new block with the given previous header and transactions.
-func (b *Block) AddTransaction(tx *Transaction) {
-	b.Transactions = append(b.Transactions, tx)
-	hash, _ := CalculateTxHash(b.Transactions)
-	b.TxHash = hash
-}
-
-// Sign signs the block with the given private key.
-func (b *Block) Sign(privKey crypto.PrivateKey) error {
-	signature, err := privKey.Sign(b.Header.Bytes())
+func SerializeHeader(h *proto.Header) ([]byte, error) {
+	data, err := pb.Marshal(h)
 	if err != nil {
-		return err
+		return nil, errors.New("failed to marshal header")
 	}
 
-	b.PublicKey = *privKey.PublicKey()
-	b.Signature = signature
-
-	fmt.Println("Block signed by", b.PublicKey.Address().String())
-	fmt.Println("Block signature", b.Signature.String())
-
-	return nil
+	return data, nil
 }
 
-// Verify verifies the block.
-func (b *Block) Verify() error {
-	if b.Signature == nil {
-		return fmt.Errorf("block has no signature")
+func DeserializeHeader(data []byte) (*proto.Header, error) {
+	h := &proto.Header{}
+	if err := pb.Unmarshal(data, h); err != nil {
+		return nil, errors.New("failed to unmarshal header")
 	}
 
-	if !b.Signature.Verify(&b.PublicKey, b.Header.Bytes()) {
-		return fmt.Errorf("block has invalid signature")
+	return h, nil
+}
+
+func SerializeBlock(b *proto.Block) ([]byte, error) {
+	data, err := pb.Marshal(b)
+	if err != nil {
+		return nil, errors.New("failed to marshal block")
 	}
 
+	return data, nil
+}
+
+func DeserializeBlock(data []byte) (*proto.Block, error) {
+	b := &proto.Block{}
+	if err := pb.Unmarshal(data, b); err != nil {
+		return nil, errors.New("failed to unmarshal block")
+	}
+
+	return b, nil
+}
+
+func SignBlock(privateKey *crypto.PrivateKey, b *proto.Block) (*crypto.Signature, error) {
+	hash, err := HashBlock(b)
+	if err != nil {
+		return nil, errors.New("failed to hash block")
+	}
+	signature, err := privateKey.Sign(hash)
+	if err != nil {
+		return nil, errors.New("failed to sign block")
+	}
+	b.Signature = signature.Bytes()
+	b.PublicKey = privateKey.PublicKey().Bytes()
+	b.Hash = hash
+
+	return signature, nil
+}
+
+func VerifyBlock(b *proto.Block) (bool, error) {
+	// TODO: Check transaction signatures
 	for _, tx := range b.Transactions {
-		if err := tx.Verify(); err != nil {
-			return err
+		isValid, err := VerifyTransaction(tx)
+		if err != nil {
+			return false, err
+		}
+		if !isValid {
+			return false, errors.New("invalid transaction")
 		}
 	}
 
-	txHash, err := CalculateTxHash(b.Transactions)
+	if b.Signature == nil || len(b.Signature) != crypto.SignatureSize {
+		return false, errors.New("invalid block signature")
+	}
+
+	if b.PublicKey == nil || len(b.PublicKey) != crypto.PublicKeySize {
+		return false, errors.New("invalid block public key")
+	}
+
+	signature := crypto.SignatureFromBytes(b.Signature)
+	publicKey := crypto.PublicKeyFromBytes(b.PublicKey)
+	hash, err := HashBlock(b)
+	if err != nil {
+		return false, errors.New("failed to hash block")
+	}
+	isValid := signature.Verify(publicKey, hash)
+
+	return isValid, nil
+}
+
+// HashHeader hashes the header of a block.
+func HashHeader(h *proto.Header) ([]byte, error) {
+	b, err := pb.Marshal(h)
+	if err != nil {
+		return nil, errors.New("failed to hash header")
+	}
+
+	hash := sha256.Sum256(b)
+
+	return hash[:], nil
+}
+
+// HashBlock returns the hash of the Block Header.
+func HashBlock(b *proto.Block) ([]byte, error) {
+	return HashHeader(b.Header)
+}
+
+// AddTransaction adds a transaction to a block.
+func AddTransaction(b *proto.Block, tx *proto.Transaction) error {
+	b.Transactions = append(b.Transactions, tx)
+	hash, err := CalculateTxHashV2(b.Transactions)
 	if err != nil {
 		return err
 	}
-
-	if txHash != b.TxHash {
-		return fmt.Errorf("block (%s) has an invalid tx hash", b.Hash(BlockHasher{}))
-	}
+	b.Header.TxHash = hash
 
 	return nil
 }
 
-// Decode decodes the block from the given decoder.
-func (b *Block) Decode(dec Decoder[*Block]) error {
-	return dec.Decode(b)
-}
-
-// Encode encodes the block with the given encoder.
-func (b *Block) Encode(enc Encoder[*Block]) error {
-	return enc.Encode(b)
-}
-
-// Hash returns the hash of the block.
-func (b *Block) Hash(hasher Hasher[*Header]) types.Hash {
-	if b.hash.IsZero() {
-		b.hash = hasher.Hash(b.Header)
-	}
-
-	return b.hash
-}
-
-// CalculateTxHash calculates the hash of the transactions.
-func CalculateTxHash(txs []*Transaction) (types.Hash, error) {
-	var hash types.Hash
-	buf := &bytes.Buffer{}
-
+// CalculateTxHash calculates the hash of the transactions in a block.
+func CalculateTxHashV2(txs []*proto.Transaction) ([]byte, error) {
+	hasher := sha256.New()
 	for _, tx := range txs {
-		if err := gob.NewEncoder(buf).Encode(tx); err != nil {
-			return hash, err
+		hash, err := HashTransaction(tx)
+		if err != nil {
+			return nil, err
 		}
+		hasher.Write(hash)
 	}
 
-	hash = sha256.Sum256(buf.Bytes())
-
-	return hash, nil
+	return hasher.Sum(nil), nil
 }

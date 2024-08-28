@@ -13,7 +13,7 @@ func TestGeneratePrivateKey(t *testing.T) {
 	assert.Equal(t, privateKeySize, len(privateKey.Bytes()))
 
 	publicKey := privateKey.PublicKey()
-	assert.Equal(t, publicKeySize, len(publicKey.Bytes()))
+	assert.Equal(t, PublicKeySize, len(publicKey.Bytes()))
 }
 
 func TestGetMnemonicFromEntropy(t *testing.T) {
@@ -27,13 +27,13 @@ func TestGetMnemonicFromEntropy(t *testing.T) {
 func TestNewPrivateKeyFromMnemonic(t *testing.T) {
 	// entropy := "067f627b554f9f167782f1c8557860b6"
 	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
-	addressString := "6b5d53b1f559198ad5638467ff13b64b9adfdfeb"
+	addressString := "e15af3cd7d9c09ebaf20d1f97ea396c218b66037"
 
 	privateKey := NewPrivateKeyfromMnemonic(mnemonic)
 	assert.Equal(t, privateKeySize, len(privateKey.Bytes()))
 
 	publicKey := privateKey.PublicKey()
-	assert.Equal(t, publicKeySize, len(publicKey.Bytes()))
+	assert.Equal(t, PublicKeySize, len(publicKey.Bytes()))
 
 	address := publicKey.Address()
 	assert.Equal(t, addressString, address.String())
@@ -60,7 +60,7 @@ func TestPrivateKeySign(t *testing.T) {
 	signature, _ := privateKey.Sign(data)
 
 	// Check that the signature is the correct size
-	assert.Equal(t, signatureSize, len(signature.Value))
+	assert.Equal(t, SignatureSize, len(signature.Value))
 
 	// Check that the signature is valid
 	assert.True(t, signature.Verify(publicKey, data))

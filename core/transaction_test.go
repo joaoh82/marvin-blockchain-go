@@ -1,86 +1,53 @@
 package core
 
 import (
-	"bytes"
 	"testing"
 
 	"github.com/joaoh82/marvinblockchain/crypto"
-	"github.com/joaoh82/marvinblockchain/types"
+	"github.com/joaoh82/marvinblockchain/proto"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVerifyTransactionWithTamper(t *testing.T) {
-	tx := NewTransaction(nil)
-
+func TestSignTransactionV2(t *testing.T) {
 	fromPrivKey := crypto.GeneratePrivateKey()
 	toPrivKey := crypto.GeneratePrivateKey()
-	hackerPrivKey := crypto.GeneratePrivateKey()
 
-	tx.From = *fromPrivKey.PublicKey()
-	tx.To = *toPrivKey.PublicKey()
-	tx.Value = 666
-
-	assert.Nil(t, tx.Sign(fromPrivKey))
-	tx.hash = types.Hash{}
-
-	tx.To = *hackerPrivKey.PublicKey()
-
-	assert.NotNil(t, tx.Verify())
-}
-
-func TestNativeTransferTransaction(t *testing.T) {
-	fromPrivKey := crypto.GeneratePrivateKey()
-	toPrivKey := crypto.GeneratePrivateKey()
-	tx := &Transaction{
-		To:    *toPrivKey.PublicKey(),
-		Value: 666,
+	tx := &proto.Transaction{
+		From:  fromPrivKey.PublicKey().Bytes(),
+		To:    toPrivKey.PublicKey().Bytes(),
+		Value: 42,
+		Data:  []byte("data"),
+		Nonce: 1,
 	}
 
-	assert.Nil(t, tx.Sign(fromPrivKey))
-}
-
-func TestSignTransaction(t *testing.T) {
-	privKey := crypto.GeneratePrivateKey()
-	tx := &Transaction{
-		Data: []byte("marvin"),
-	}
-
-	assert.Nil(t, tx.Sign(privKey))
+	err := SignTransaction(fromPrivKey, tx)
+	assert.Nil(t, err)
 	assert.NotNil(t, tx.Signature)
+
+	isValid, err := VerifyTransaction(tx)
+	assert.Nil(t, err)
+	assert.True(t, isValid)
 }
 
-func TestVerifyTransaction(t *testing.T) {
-	privKey := crypto.GeneratePrivateKey()
-	tx := &Transaction{
-		Data: []byte("foo"),
+func TestSignTransactionV2InvalidSignature(t *testing.T) {
+	fromPrivKey := crypto.GeneratePrivateKey()
+	toPrivKey := crypto.GeneratePrivateKey()
+
+	tx := &proto.Transaction{
+		From:  fromPrivKey.PublicKey().Bytes(),
+		To:    toPrivKey.PublicKey().Bytes(),
+		Value: 42,
+		Data:  []byte("data"),
+		Nonce: 1,
 	}
 
-	assert.Nil(t, tx.Sign(privKey))
-	assert.Nil(t, tx.Verify())
+	err := SignTransaction(fromPrivKey, tx)
+	assert.Nil(t, err)
+	assert.NotNil(t, tx.Signature)
 
-	otherPrivKey := crypto.GeneratePrivateKey()
-	tx.From = *otherPrivKey.PublicKey()
+	tx.Value = 43
 
-	assert.NotNil(t, tx.Verify())
-}
-
-func TestTxEncodeDecode(t *testing.T) {
-	tx := GenerateRandomTxWithSignature(t)
-	buf := &bytes.Buffer{}
-	assert.Nil(t, tx.Encode(NewTxEncoder(buf)))
-	tx.hash = types.Hash{}
-
-	txDecoded := new(Transaction)
-	assert.Nil(t, txDecoded.Decode(NewTxDecoder(buf)))
-	assert.Equal(t, tx, txDecoded)
-}
-
-func GenerateRandomTxWithSignature(t *testing.T) *Transaction {
-	privKey := crypto.GeneratePrivateKey()
-	tx := Transaction{
-		Data: []byte("marvin"),
-	}
-	assert.Nil(t, tx.Sign(privKey))
-
-	return &tx
+	isValid, err := VerifyTransaction(tx)
+	assert.Nil(t, err)
+	assert.False(t, isValid)
 }
