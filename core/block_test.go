@@ -86,7 +86,7 @@ func TestSerializeDeserializeBlock(t *testing.T) {
 	assert.Equal(t, b.Transactions[0].Data, b2.Transactions[0].Data)
 }
 
-func TestSignBlockV2(t *testing.T) {
+func TestSignBlock(t *testing.T) {
 	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
 	addressString := "e15af3cd7d9c09ebaf20d1f97ea396c218b66037"
 
@@ -125,8 +125,8 @@ func TestSignBlockV2(t *testing.T) {
 	assert.NotNil(t, sig)
 }
 
-func TestVerifyBlockV2(t *testing.T) {
-	b := GenerateRandomBlockV2(t, 100, []byte("prev"))
+func TestVerifyBlock(t *testing.T) {
+	b := GenerateRandomBlock(t, 100, []byte("prev"))
 	isValid, err := VerifyBlock(b)
 	if err != nil {
 		t.Fatal(err)
@@ -146,7 +146,7 @@ func TestVerifyBlockV2(t *testing.T) {
 }
 
 // GenerateRandomBlock generates a random block for testing purposes
-func GenerateRandomBlockV2(t *testing.T, height uint64, prevBlockHash []byte) *proto.Block {
+func GenerateRandomBlock(t *testing.T, height uint64, prevBlockHash []byte) *proto.Block {
 	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
 	addressString := "e15af3cd7d9c09ebaf20d1f97ea396c218b66037"
 
@@ -179,7 +179,7 @@ func GenerateRandomBlockV2(t *testing.T, height uint64, prevBlockHash []byte) *p
 	SignTransaction(&privateKey, tx)
 	AddTransaction(b, tx)
 
-	txHash, err := CalculateTxHashV2(b.Transactions)
+	txHash, err := CalculateTxHash(b.Transactions)
 	assert.Nil(t, err)
 	b.Header.TxHash = txHash
 	sig, err := SignBlock(&privateKey, b)

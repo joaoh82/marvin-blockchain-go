@@ -2,11 +2,30 @@ package core
 
 import (
 	"crypto/sha256"
+	"errors"
 
 	"github.com/joaoh82/marvinblockchain/crypto"
 	"github.com/joaoh82/marvinblockchain/proto"
 	pb "google.golang.org/protobuf/proto"
 )
+
+func SerializeTransaction(tx *proto.Transaction) ([]byte, error) {
+	data, err := pb.Marshal(tx)
+	if err != nil {
+		return nil, errors.New("failed to marshal header")
+	}
+
+	return data, nil
+}
+
+func DeserializeTransaction(data []byte) (*proto.Transaction, error) {
+	tx := &proto.Transaction{}
+	if err := pb.Unmarshal(data, tx); err != nil {
+		return nil, errors.New("failed to unmarshal header")
+	}
+
+	return tx, nil
+}
 
 // SignTransaction signs a transaction with a private key.
 func SignTransaction(pk *crypto.PrivateKey, tx *proto.Transaction) error {

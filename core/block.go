@@ -112,7 +112,7 @@ func HashBlock(b *proto.Block) ([]byte, error) {
 // AddTransaction adds a transaction to a block.
 func AddTransaction(b *proto.Block, tx *proto.Transaction) error {
 	b.Transactions = append(b.Transactions, tx)
-	hash, err := CalculateTxHashV2(b.Transactions)
+	hash, err := CalculateTxHash(b.Transactions)
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func AddTransaction(b *proto.Block, tx *proto.Transaction) error {
 }
 
 // CalculateTxHash calculates the hash of the transactions in a block.
-func CalculateTxHashV2(txs []*proto.Transaction) ([]byte, error) {
+func CalculateTxHash(txs []*proto.Transaction) ([]byte, error) {
 	hasher := sha256.New()
 	for _, tx := range txs {
 		hash, err := HashTransaction(tx)
