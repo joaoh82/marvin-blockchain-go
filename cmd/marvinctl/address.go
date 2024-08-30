@@ -28,9 +28,17 @@ var addressCreateCmd = &cobra.Command{
 			fmt.Println("Error generating entropy:", err)
 			return
 		}
-		mnemonic := crypto.GetMnemonicFromEntropy(entropy)
+		mnemonic, err := crypto.GetMnemonicFromEntropy(entropy)
+		if err != nil {
+			fmt.Println("Error generating mnemonic:", err)
+			return
+		}
 
-		privateKey := crypto.NewPrivateKeyfromMnemonic(mnemonic)
+		privateKey, err := crypto.NewPrivateKeyfromMnemonic(mnemonic)
+		if err != nil {
+			fmt.Println("Error generating private key:", err)
+			return
+		}
 		publicKey := privateKey.PublicKey()
 		address := publicKey.Address()
 		fmt.Println("mnemonic:", mnemonic)
@@ -57,7 +65,11 @@ var mnemonicAddressRestoreCmd = &cobra.Command{
 		}
 
 		// mnemonic := args[0]
-		privateKey := crypto.NewPrivateKeyfromMnemonic(mnemonic.Value.String())
+		privateKey, err := crypto.NewPrivateKeyfromMnemonic(mnemonic.Value.String())
+		if err != nil {
+			fmt.Println("Error generating private key:", err)
+			return
+		}
 		publicKey := privateKey.PublicKey()
 		address := publicKey.Address()
 		fmt.Println("address:", address)

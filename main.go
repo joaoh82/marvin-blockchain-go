@@ -21,7 +21,7 @@ func BlockSerialization() {
 
 	mnemonicTo := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
 	// Generate a new private key from the mnemonic
-	privateKeyTo := crypto.NewPrivateKeyfromMnemonic(mnemonicTo)
+	privateKeyTo, _ := crypto.NewPrivateKeyfromMnemonic(mnemonicTo)
 	// fmt.Println("private key TO:", privateKeyTo)
 	publicKeyTo := privateKeyTo.PublicKey()
 	// fmt.Println("public key TO:", publicKeyTo)
@@ -30,7 +30,7 @@ func BlockSerialization() {
 
 	mnemonicFrom := "hello wild paddle pride wheat menu task funny sign profit blouse hockey"
 	// Generate a new private key from the mnemonic
-	privateKeyFrom := crypto.NewPrivateKeyfromMnemonic(mnemonicFrom)
+	privateKeyFrom, _ := crypto.NewPrivateKeyfromMnemonic(mnemonicFrom)
 	// fmt.Println("private key FROM:", privateKeyFrom)
 	publicKeyFrom := privateKeyFrom.PublicKey()
 	// fmt.Println("public key FROM:", publicKeyFrom)
@@ -81,13 +81,13 @@ func GenerateKeyPairFullCycle() {
 		fmt.Println("Error generating entropy:", err)
 		return
 	}
-	mnemonic := crypto.GetMnemonicFromEntropy(entropy)
+	mnemonic, _ := crypto.GetMnemonicFromEntropy(entropy)
 
 	fmt.Println("entropy:", entropy)
 	fmt.Println("mnemonic:", mnemonic)
 
 	// Generate a new private key from the mnemonic
-	privateKey := crypto.NewPrivateKeyfromMnemonic(mnemonic)
+	privateKey, _ := crypto.NewPrivateKeyfromMnemonic(mnemonic)
 	fmt.Println("private key:", privateKey)
 	publicKey := privateKey.PublicKey()
 	fmt.Println("public key:", publicKey)

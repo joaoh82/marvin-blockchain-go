@@ -81,8 +81,14 @@ func VerifyBlock(b *proto.Block) (bool, error) {
 		return false, errors.New("invalid block public key")
 	}
 
-	signature := crypto.SignatureFromBytes(b.Signature)
-	publicKey := crypto.PublicKeyFromBytes(b.PublicKey)
+	signature, err := crypto.SignatureFromBytes(b.Signature)
+	if err != nil {
+		return false, err
+	}
+	publicKey, err := crypto.PublicKeyFromBytes(b.PublicKey)
+	if err != nil {
+		return false, err
+	}
 	hash, err := HashBlock(b)
 	if err != nil {
 		return false, errors.New("failed to hash block")

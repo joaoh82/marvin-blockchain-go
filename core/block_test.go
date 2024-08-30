@@ -90,7 +90,8 @@ func TestSignBlock(t *testing.T) {
 	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
 	addressString := "e15af3cd7d9c09ebaf20d1f97ea396c218b66037"
 
-	privateKey := crypto.NewPrivateKeyfromMnemonic(mnemonic)
+	privateKey, err := crypto.NewPrivateKeyfromMnemonic(mnemonic)
+	assert.Nil(t, err)
 	publicKey := privateKey.PublicKey()
 	address := publicKey.Address()
 	assert.Equal(t, addressString, address.String())
@@ -134,7 +135,8 @@ func TestVerifyBlock(t *testing.T) {
 	assert.True(t, isValid)
 
 	// Test with invalid keypair
-	invalidPrivateKey := crypto.GeneratePrivateKey()
+	invalidPrivateKey, err := crypto.GeneratePrivateKey()
+	assert.Nil(t, err)
 	invalidPublicKey := invalidPrivateKey.PublicKey()
 	b.PublicKey = invalidPublicKey.Bytes()
 	isValid, err = VerifyBlock(b)
@@ -150,12 +152,14 @@ func GenerateRandomBlock(t *testing.T, height uint64, prevBlockHash []byte) *pro
 	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
 	addressString := "e15af3cd7d9c09ebaf20d1f97ea396c218b66037"
 
-	privateKey := crypto.NewPrivateKeyfromMnemonic(mnemonic)
+	privateKey, err := crypto.NewPrivateKeyfromMnemonic(mnemonic)
+	assert.Nil(t, err)
 	publicKey := privateKey.PublicKey()
 	address := publicKey.Address()
 	assert.Equal(t, addressString, address.String())
 
-	toPrivKey := crypto.GeneratePrivateKey()
+	toPrivKey, err := crypto.GeneratePrivateKey()
+	assert.Nil(t, err)
 
 	b := &proto.Block{
 		Header: &proto.Header{

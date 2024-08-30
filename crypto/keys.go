@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/sha512"
 	"encoding/hex"
+	"fmt"
 	"io"
 
 	"github.com/tyler-smith/go-bip39"
@@ -25,18 +26,22 @@ type PrivateKey struct {
 }
 
 // GetMnemonicFromEntropy generates a new mnemonic from a given entropy.
-func GetMnemonicFromEntropy(entropy []byte) string {
+func GetMnemonicFromEntropy(entropy []byte) (string, error) {
 	mnemonic, err := bip39.NewMnemonic(entropy)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return mnemonic
+	return mnemonic, nil
 }
 
 // NewPrivateKeyfromMenmonic creates a new private key from a given mnemonic.
-func NewPrivateKeyfromMnemonic(mnemonic string) PrivateKey {
+func NewPrivateKeyfromMnemonic(mnemonic string) (PrivateKey, error) {
 	seed := SeedFromMnemonic(mnemonic)
-	return NewPrivateKeyFromSeed(seed)
+	pk, err := NewPrivateKeyFromSeed(seed)
+	if err != nil {
+		return PrivateKey{}, err
+	}
+	return pk, nil
 }
 
 // SeedFromMnemonic creates a new seed from a given mnemonic.
@@ -46,35 +51,35 @@ func SeedFromMnemonic(mnemonic string) []byte {
 }
 
 // NewPrivateKeyfromString creates a new private key from a given hex string.
-func NewPrivateKeyfromString(s string) PrivateKey {
+func NewPrivateKeyfromString(s string) (PrivateKey, error) {
 	b, err := hex.DecodeString(s)
 	if err != nil {
-		panic(err)
+		return PrivateKey{}, err
 	}
 	return NewPrivateKeyFromSeed(b)
 }
 
 // NewPrivateKeyFromSeed creates a new private key from a given seed byte slice.
-func NewPrivateKeyFromSeed(seed []byte) PrivateKey {
+func NewPrivateKeyFromSeed(seed []byte) (PrivateKey, error) {
 	if len(seed) != seedSize {
-		panic("invalid seed size, must be 32 bytes")
+		return PrivateKey{}, fmt.Errorf("invalid seed size, must be 32 bytes")
 	}
 
 	return PrivateKey{
 		Key: ed25519.NewKeyFromSeed(seed),
-	}
+	}, nil
 }
 
 // GeneratePrivateKey generates a new private key.
-func GeneratePrivateKey() *PrivateKey {
+func GeneratePrivateKey() (*PrivateKey, error) {
 	seed := make([]byte, seedSize)
 	_, err := io.ReadFull(rand.Reader, seed)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return &PrivateKey{
 		Key: ed25519.NewKeyFromSeed(seed),
-	}
+	}, nil
 }
 
 // Bytes creates a new private key from a byte slice.
@@ -108,13 +113,13 @@ type PublicKey struct {
 	Key ed25519.PublicKey
 }
 
-func PublicKeyFromBytes(b []byte) *PublicKey {
+func PublicKeyFromBytes(b []byte) (*PublicKey, error) {
 	if len(b) != PublicKeySize {
-		panic("invalid public key length")
+		return nil, fmt.Errorf("invalid public key length")
 	}
 	return &PublicKey{
 		Key: ed25519.PublicKey(b),
-	}
+	}, nil
 }
 
 // Address returns the address for the public key.
@@ -138,13 +143,13 @@ type Signature struct {
 	Value []byte
 }
 
-func SignatureFromBytes(b []byte) *Signature {
+func SignatureFromBytes(b []byte) (*Signature, error) {
 	if len(b) != SignatureSize {
-		panic("signature length of the bytes not equal to 64")
+		return nil, fmt.Errorf("invalid signature length")
 	}
 	return &Signature{
 		Value: b,
-	}
+	}, nil
 }
 
 // Bytes creates a new signature from a byte slice.
@@ -168,13 +173,13 @@ type Address struct {
 	Value []byte
 }
 
-func AddressFromBytes(b []byte) Address {
+func AddressFromBytes(b []byte) (Address, error) {
 	if len(b) != addressSize {
-		panic("length of the (address) bytes not equal to 20")
+		return Address{}, fmt.Errorf("length of the (address) bytes not equal to 20")
 	}
 	return Address{
 		Value: b,
-	}
+	}, nil
 }
 
 // Bytes creates a new address from a byte slice.

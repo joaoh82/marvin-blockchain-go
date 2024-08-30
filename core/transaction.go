@@ -41,7 +41,7 @@ func SignTransaction(pk *crypto.PrivateKey, tx *proto.Transaction) error {
 
 	tx.Signature = sig.Bytes()
 	tx.Hash = hash
-	// tx.From = pk.PublicKey().Bytes()
+	tx.From = pk.PublicKey().Bytes()
 
 	return nil
 }
@@ -76,8 +76,14 @@ func VerifyTransaction(tx *proto.Transaction) (bool, error) {
 	tx.Signature = tempSig
 	tx.Hash = tempHash
 
-	signature := crypto.SignatureFromBytes(tx.Signature)
-	publicKey := crypto.PublicKeyFromBytes(tx.From)
+	signature, err := crypto.SignatureFromBytes(tx.Signature)
+	if err != nil {
+		return false, err
+	}
+	publicKey, err := crypto.PublicKeyFromBytes(tx.From)
+	if err != nil {
+		return false, err
+	}
 	isValid := signature.Verify(publicKey, hash)
 
 	return isValid, nil

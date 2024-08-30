@@ -9,8 +9,10 @@ import (
 )
 
 func TestSignTransactionV2(t *testing.T) {
-	fromPrivKey := crypto.GeneratePrivateKey()
-	toPrivKey := crypto.GeneratePrivateKey()
+	fromPrivKey, err := crypto.GeneratePrivateKey()
+	assert.Nil(t, err)
+	toPrivKey, err := crypto.GeneratePrivateKey()
+	assert.Nil(t, err)
 
 	tx := &proto.Transaction{
 		From:  fromPrivKey.PublicKey().Bytes(),
@@ -20,7 +22,7 @@ func TestSignTransactionV2(t *testing.T) {
 		Nonce: 1,
 	}
 
-	err := SignTransaction(fromPrivKey, tx)
+	err = SignTransaction(fromPrivKey, tx)
 	assert.Nil(t, err)
 	assert.NotNil(t, tx.Signature)
 
@@ -30,8 +32,10 @@ func TestSignTransactionV2(t *testing.T) {
 }
 
 func TestSignTransactionV2InvalidSignature(t *testing.T) {
-	fromPrivKey := crypto.GeneratePrivateKey()
-	toPrivKey := crypto.GeneratePrivateKey()
+	fromPrivKey, err := crypto.GeneratePrivateKey()
+	assert.Nil(t, err)
+	toPrivKey, err := crypto.GeneratePrivateKey()
+	assert.Nil(t, err)
 
 	tx := &proto.Transaction{
 		From:  fromPrivKey.PublicKey().Bytes(),
@@ -41,7 +45,7 @@ func TestSignTransactionV2InvalidSignature(t *testing.T) {
 		Nonce: 1,
 	}
 
-	err := SignTransaction(fromPrivKey, tx)
+	err = SignTransaction(fromPrivKey, tx)
 	assert.Nil(t, err)
 	assert.NotNil(t, tx.Signature)
 
