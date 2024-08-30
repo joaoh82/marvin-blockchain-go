@@ -3,7 +3,6 @@ module github.com/joaoh82/marvinblockchain
 go 1.21
 
 require (
-	github.com/golang/protobuf v1.5.0
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 	github.com/tyler-smith/go-bip39 v1.1.0
