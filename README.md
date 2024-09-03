@@ -88,7 +88,7 @@ make test
 - [x] Basic transaction and block data structures and validation
 - [ ] Add better error handling and logging
 - [x] Add protobuf enconding/decoding
-- [ ] Implement the basic blockchain data structure
+- [x] Implement the basic blockchain data structure
 
 ### Roadmap (Subject to Change)
 - [ ] Proof of Work (PoW) consensus mechanism

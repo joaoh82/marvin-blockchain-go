@@ -147,7 +147,7 @@ func TestVerifyBlock(t *testing.T) {
 
 }
 
-// GenerateRandomBlock generates a random block for testing purposes
+// GenerateRandomBlock generates a random block with signature for testing purposes
 func GenerateRandomBlock(t *testing.T, height uint64, prevBlockHash []byte) *proto.Block {
 	mnemonic := "all wild paddle pride wheat menu task funny sign profit blouse hockey"
 	addressString := "e15af3cd7d9c09ebaf20d1f97ea396c218b66037"
@@ -163,10 +163,10 @@ func GenerateRandomBlock(t *testing.T, height uint64, prevBlockHash []byte) *pro
 
 	b := &proto.Block{
 		Header: &proto.Header{
-			PrevBlockHash: []byte("prev"),
+			PrevBlockHash: prevBlockHash,
 			TxHash:        []byte("tx"),
 			Version:       1,
-			Height:        100,
+			Height:        height,
 			Timestamp:     1724695016265493000,
 			Nonce:         1,
 			Difficulty:    1,

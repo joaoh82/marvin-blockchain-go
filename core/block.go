@@ -62,7 +62,7 @@ func SignBlock(privateKey *crypto.PrivateKey, b *proto.Block) (*crypto.Signature
 }
 
 func VerifyBlock(b *proto.Block) (bool, error) {
-	// TODO: Check transaction signatures
+	// Verify the transactions
 	for _, tx := range b.Transactions {
 		isValid, err := VerifyTransaction(tx)
 		if err != nil {
