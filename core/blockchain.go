@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/joaoh82/marvinblockchain/crypto"
 	"github.com/joaoh82/marvinblockchain/proto"
 )
@@ -38,7 +40,6 @@ func NewBlockchain(store Storage) *Blockchain {
 
 // AddBlock adds a block to the blockchain
 func (bc *Blockchain) AddBlock(b *proto.Block) error {
-	fmt.Printf("Adding block %d to the blockchain\n", b.Header.GetHeight())
 	// Validate the block before adding it to the blockchain
 	if err := bc.ValidateBlock(b); err != nil {
 		return err
@@ -50,6 +51,13 @@ func (bc *Blockchain) AddBlock(b *proto.Block) error {
 func (bc *Blockchain) addBlock(b *proto.Block) error {
 	bc.headers.Add(b.Header)
 
+	// Log the block added to the blockchain
+	log.Info().Fields(map[string]interface{}{
+		"height": b.Header.Height,
+		"hash":   hex.EncodeToString(b.Hash),
+	}).Msg("block added to blockchain")
+
+	// Store the block in the storage
 	return bc.store.Put(b)
 }
 
