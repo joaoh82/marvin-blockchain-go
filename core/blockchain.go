@@ -11,6 +11,7 @@ import (
 
 	"github.com/joaoh82/marvinblockchain/crypto"
 	"github.com/joaoh82/marvinblockchain/proto"
+	"github.com/joaoh82/marvinblockchain/types"
 )
 
 // TODO: Pass the mnemonic as a parameter in a configuration file or as an environment variable
@@ -75,7 +76,7 @@ func (bc *Blockchain) HasBlock(height int) bool {
 func (bc *Blockchain) ValidateBlock(b *proto.Block) error {
 	// Check if the blockchain already has the block
 	if bc.HasBlock(int(b.Header.GetHeight())) {
-		blockHash, _ := HashBlock(b)
+		blockHash, _ := types.HashBlock(b)
 		return fmt.Errorf("blockchain already has block at height (%d) with hash (%s)", b.Header.Height, hex.EncodeToString(blockHash))
 	}
 
@@ -85,7 +86,7 @@ func (bc *Blockchain) ValidateBlock(b *proto.Block) error {
 	}
 
 	// Check if the block is valid
-	if ok, err := VerifyBlock(b); err != nil || !ok {
+	if ok, err := types.VerifyBlock(b); err != nil || !ok {
 		return fmt.Errorf("block verification failed: %v", err)
 	}
 
@@ -94,7 +95,7 @@ func (bc *Blockchain) ValidateBlock(b *proto.Block) error {
 	if err != nil {
 		return err
 	}
-	lastHeaderHash, err := HashHeader(lastHeader)
+	lastHeaderHash, err := types.HashHeader(lastHeader)
 	if err != nil {
 		return err
 	}
@@ -122,7 +123,7 @@ func (bc *Blockchain) GetBlockByHeight(height int) (*proto.Block, error) {
 		return nil, fmt.Errorf("blockchain does not have block at height (%d)", height)
 	}
 	header := bc.headers.Get(height)
-	headerHash, err := HashHeader(header)
+	headerHash, err := types.HashHeader(header)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +172,7 @@ func createGenesisBlock() (*proto.Block, error) {
 	}
 
 	// Sign the block
-	SignBlock(&private_key, block)
+	types.SignBlock(&private_key, block)
 
 	return block, nil
 }

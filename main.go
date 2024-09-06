@@ -4,9 +4,9 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/joaoh82/marvinblockchain/core"
 	"github.com/joaoh82/marvinblockchain/crypto"
 	"github.com/joaoh82/marvinblockchain/proto"
+	"github.com/joaoh82/marvinblockchain/types"
 	"github.com/tyler-smith/go-bip39"
 )
 
@@ -64,12 +64,12 @@ func BlockSerialization() {
 		Nonce:     123,
 		Hash:      make([]byte, 32),
 	}
-	core.SignTransaction(&privateKeyFrom, tx)
-	core.AddTransaction(block, tx)
+	types.SignTransaction(&privateKeyFrom, tx)
+	types.AddTransaction(block, tx)
 
-	core.SignBlock(&privateKeyFrom, block)
+	types.SignBlock(&privateKeyFrom, block)
 
-	bBlock, _ := core.SerializeBlock(block)
+	bBlock, _ := types.SerializeBlock(block)
 	fmt.Println("GO: Block WITH TRANSACTIONS hex:", hex.EncodeToString(bBlock))
 
 }
