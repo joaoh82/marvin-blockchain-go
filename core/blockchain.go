@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -19,6 +20,7 @@ const chainMnemonic = "velvet echo quill jungle nimbus crescent whisk anchor har
 type Blockchain struct {
 	headers *HeaderList
 	store   Storage
+	lock    sync.RWMutex
 }
 
 // NewBlockchain creates a new blockchain
@@ -33,7 +35,7 @@ func NewBlockchain(store Storage) *Blockchain {
 	if err != nil {
 		panic(err)
 	}
-	bc.addBlock(genesisBlock)
+	bc.addBlockWithoutValidation(genesisBlock)
 
 	return bc
 }
@@ -44,11 +46,14 @@ func (bc *Blockchain) AddBlock(b *proto.Block) error {
 	if err := bc.ValidateBlock(b); err != nil {
 		return err
 	}
-	return bc.addBlock(b)
+	return bc.addBlockWithoutValidation(b)
 }
 
 // addBlock adds a block to the blockchain without validation
-func (bc *Blockchain) addBlock(b *proto.Block) error {
+func (bc *Blockchain) addBlockWithoutValidation(b *proto.Block) error {
+	bc.lock.Lock()
+	defer bc.lock.Unlock()
+
 	bc.headers.Add(b.Header)
 
 	// Log the block added to the blockchain
@@ -129,6 +134,10 @@ func (bc *Blockchain) GetHeaderByHeight(height int) (*proto.Header, error) {
 	if !bc.HasBlock(height) {
 		return nil, fmt.Errorf("blockchain does not have block at height (%d)", height)
 	}
+
+	bc.lock.Lock()
+	defer bc.lock.Unlock()
+
 	return bc.headers.Get(height), nil
 }
 
@@ -136,6 +145,10 @@ func (bc *Blockchain) GetHeaderByHeight(height int) (*proto.Header, error) {
 func (bc *Blockchain) Height() int {
 	// [0, 1, 2 ,3] => 4 len
 	// [0, 1, 2 ,3] => 3 height
+
+	bc.lock.Lock()
+	defer bc.lock.Unlock()
+
 	return bc.headers.Height()
 }
 
