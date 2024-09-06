@@ -9,19 +9,20 @@ import (
 	"github.com/joaoh82/marvinblockchain/types"
 )
 
-type Hash []byte
-
+// Mempool is a pool of transactions that are not yet included in a block
 type Mempool struct {
 	lock         sync.RWMutex
 	transactions map[string]*proto.Transaction
 }
 
+// NewMempool creates a new mempool
 func NewMempool() *Mempool {
 	return &Mempool{
 		transactions: make(map[string]*proto.Transaction),
 	}
 }
 
+// Flush removes all transactions from the mempool
 func (m *Mempool) Flush() {
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -29,6 +30,7 @@ func (m *Mempool) Flush() {
 	m.transactions = make(map[string]*proto.Transaction)
 }
 
+// Len returns the number of transactions in the mempool
 func (m *Mempool) Len() int {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
@@ -36,6 +38,7 @@ func (m *Mempool) Len() int {
 	return len(m.transactions)
 }
 
+// Has returns true if the mempool has the transaction
 func (m *Mempool) Has(tx *proto.Transaction) bool {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
@@ -50,6 +53,7 @@ func (m *Mempool) Has(tx *proto.Transaction) bool {
 	return ok
 }
 
+// Add adds a transaction to the mempool
 func (m *Mempool) Add(tx *proto.Transaction) error {
 	if m.Has(tx) {
 		return fmt.Errorf("transaction already exists in the mempool")
