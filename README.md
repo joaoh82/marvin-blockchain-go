@@ -89,10 +89,10 @@ make test
 - [x] Add better error handling and logging
 - [x] Add protobuf enconding/decoding
 - [x] Implement the basic blockchain data structure
+- [ ] Peer-to-Peer (P2P) networking implementation (transport layer)
 
 ### Roadmap (Subject to Change)
 - [ ] Proof of Work (PoW) consensus mechanism
-- [ ] Peer-to-Peer (P2P) networking implementation (transport layer)
 - [ ] Storage and persistence for blockchain data
 - [ ] EVM integration for smart contract support
 - [ ] JSON-RPC API implementation
